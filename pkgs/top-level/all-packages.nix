@@ -3258,6 +3258,7 @@ with pkgs;
       # Binutils with glibc multi
       bintools = cc.bintools.override {
         libc = glibc_multi;
+        multilib = true;
       };
     in
     lowPrio (wrapCCWith {

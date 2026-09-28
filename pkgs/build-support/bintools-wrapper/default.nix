@@ -32,6 +32,7 @@
   noLibc ? false,
   nativeLibc,
   nativePrefix ? "",
+  multilib ? false,
   propagateDoc ? bintools != null && bintools ? man,
   extraPackages ? [ ],
   extraBuildCommands ? "",
@@ -180,6 +181,7 @@ stdenvNoCC.mkDerivation {
       nativeTools
       nativeLibc
       nativePrefix
+      multilib
       isGNU
       isLLVM
       ;
@@ -285,7 +287,10 @@ stdenvNoCC.mkDerivation {
     ##
     ## General libc support
     ##
-    optionalString (libc != null) (
+    optionalString (libc != null && !multilib) (
+      # Adding -L flag breaks mulilib by overriding the -L flag passed from compiler to select a correct libc for
+      # target arch (on lib/arch/ lib dir structures, like riscv targets).
+      # Providing a default libc doesn't make too much sense on multilib targets anyway, ignore it completely.
       ''
         touch "$out/nix-support/libc-ldflags"
         echo "-L${libc_lib}${libc.libdir or "/lib"}" >> $out/nix-support/libc-ldflags
